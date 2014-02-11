@@ -8,11 +8,25 @@
 
 #import "AppDelegate.h"
 
+void ShowErrorAlert(NSString* text)
+{
+	UIAlertView* alertView = [[UIAlertView alloc]
+                              initWithTitle:text
+                              message:nil
+                              delegate:nil
+                              cancelButtonTitle:NSLocalizedString(@"OK", nil)
+                              otherButtonTitles:nil];
+    
+	[alertView show];
+}
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    
+    _storyBoard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     return YES;
 }
 							

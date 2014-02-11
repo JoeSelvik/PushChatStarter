@@ -1,0 +1,13 @@
+PODS:
+  - AFNetworking (1.2.0)
+  - MBProgressHUD (0.6)
+
+DEPENDENCIES:
+  - AFNetworking (~> 1.2.0)
+  - MBProgressHUD (~> 0.6)
+
+SPEC CHECKSUMS:
+  AFNetworking: 3cbae45f61a9f995cdbd56bd571223910d7f4e44
+  MBProgressHUD: 9b55a90566fb5d07df0602f6fd9fa04510ad5d52
+
+COCOAPODS: 0.29.0

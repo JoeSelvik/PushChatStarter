@@ -6,10 +6,11 @@
 //  Copyright (c) 2013 Ray Wenderlich. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#define ApplicationDelegate ((AppDelegate *)[UIApplication sharedApplication].delegate)
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (strong, readonly) UIStoryboard *storyBoard;
 
 @end
