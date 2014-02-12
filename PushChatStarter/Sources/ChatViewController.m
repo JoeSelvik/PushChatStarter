@@ -179,10 +179,12 @@
 - (IBAction)composeAction
 {
 	// Show the Compose screen
-	ComposeViewController* composeController = (ComposeViewController*) [ApplicationDelegate.storyBoard instantiateViewControllerWithIdentifier:@"ComposeViewController"];
+	ComposeViewController *composeController = (ComposeViewController *) [ApplicationDelegate.storyBoard instantiateViewControllerWithIdentifier:@"ComposeViewController"];
 	composeController.dataModel = _dataModel;
 	composeController.delegate = self;
+    composeController.client = _client;
 	[self presentViewController:composeController animated:YES completion:nil];
 }
+
 
 @end

@@ -54,6 +54,37 @@
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)postMessageRequest
+{
+    [_messageTextView resignFirstResponder];
+    
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    hud.labelText = NSLocalizedString(@"Sending", nil);
+    
+    NSString *text = self.messageTextView.text;
+    
+    NSDictionary *params = @{@"cmd":@"message",
+                             @"user_id":[_dataModel userId],
+                             @"text":text};
+    
+    [_client
+     postPath:@"/api.php"
+     parameters:params
+     success:^(AFHTTPRequestOperation *operation, id responseObject) {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
+         if (operation.response.statusCode != 200) {
+             ShowErrorAlert(NSLocalizedString(@"Could not send the message to the server", nil));
+         } else {
+             [self userDidCompose:text];
+         }
+     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+         if ([self isViewLoaded]) {
+             [MBProgressHUD hideHUDForView:self.view animated:YES];
+             ShowErrorAlert([error localizedDescription]);
+         }
+     }];
+}
+
 - (IBAction)cancelAction
 {
 	[self.parentViewController dismissViewControllerAnimated:YES completion:nil];
@@ -61,7 +92,7 @@
 
 - (IBAction)saveAction
 {
-	[self userDidCompose:self.messageTextView.text];
+    [self postMessageRequest];
 }
 
 #pragma mark -

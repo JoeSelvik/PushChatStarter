@@ -20,4 +20,6 @@
 
 @property (nonatomic, assign) id<ComposeDelegate> delegate;
 @property (nonatomic, assign) DataModel* dataModel;
+@property (nonatomic, strong) AFHTTPClient *client;
+
 @end
