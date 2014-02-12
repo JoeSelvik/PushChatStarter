@@ -13,6 +13,7 @@
 static NSString* const NicknameKey = @"Nickname";
 static NSString* const SecretCodeKey = @"SecretCode";
 static NSString* const JoinedChatKey = @"JoinedChat";
+static NSString* const UserId = @"UserId";
 
 @implementation DataModel
 
@@ -105,6 +106,16 @@ static NSString* const JoinedChatKey = @"JoinedChat";
 - (void)setJoinedChat:(BOOL)value
 {
 	[[NSUserDefaults standardUserDefaults] setBool:value forKey:JoinedChatKey];
+}
+
+- (NSString*)userId
+{
+    NSString *userId = [[NSUserDefaults standardUserDefaults] stringForKey:UserId];
+    if (userId == nil || userId.length == 0) {
+        userId = [[[NSUUID UUID] UUIDString] stringByReplacingOccurrencesOfString:@"-" withString:@""];
+        [[NSUserDefaults standardUserDefaults] setObject:userId forKey:UserId];
+    }
+    return userId;
 }
 
 @end

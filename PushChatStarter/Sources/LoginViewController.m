@@ -44,6 +44,36 @@
 	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)postJoinRequest {
+	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+	hud.labelText = NSLocalizedString(@"Connecting", nil);
+    
+    NSDictionary *params = @{@"cmd":@"join",
+                             @"user_id":[_dataModel userId],
+                             @"token":[_dataModel deviceToken],
+                             @"name":[_dataModel nickname],
+                             @"code":[_dataModel secretCode]};
+    
+    [_client postPath:@"/api.php"
+           parameters:params
+              success:^(AFHTTPRequestOperation *operation, id responseObject) {
+                  // defensive programming, ignore if load not successfully loaded
+                  if ([self isViewLoaded]) {
+                      [MBProgressHUD hideHUDForView:self.view animated:YES];
+                      if([operation.response statusCode] != 200) {
+                          ShowErrorAlert(NSLocalizedString(@"There was an error communicating with the server", nil));
+                      } else {
+                          [self userDidJoin];
+                      }
+                  }
+              } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                  if ([self isViewLoaded]) {
+                      [MBProgressHUD hideHUDForView:self.view animated:YES];
+                      ShowErrorAlert([error localizedDescription]);
+                  }
+              }];
+}
+
 - (IBAction)loginAction
 {
 	if (self.nicknameTextField.text.length == 0)
@@ -65,7 +95,8 @@
 	[self.nicknameTextField resignFirstResponder];
 	[self.secretCodeTextField resignFirstResponder];
 
-	[self userDidJoin];
+	//[self userDidJoin];
+    [self postJoinRequest];
 }
 
 @end

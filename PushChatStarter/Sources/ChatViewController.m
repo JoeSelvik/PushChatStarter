@@ -13,6 +13,11 @@
 #import "MessageTableViewCell.h"
 #import "SpeechBubbleView.h"
 
+@interface ChatViewController() {
+    AFHTTPClient *_client;
+}
+@end
+
 @implementation ChatViewController
 
 - (id) initWithCoder:(NSCoder *)aDecoder {
@@ -20,6 +25,9 @@
     if (self) {
         _dataModel = [[DataModel alloc] init];
         [_dataModel loadMessages];
+        
+        // This instantiates a AFHTTPClient object which has a base URL of the server you setup.
+        _client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:ServerApiURL]];
     }
     return self;
 }
@@ -121,9 +129,10 @@
 #pragma mark Actions
 
 - (void) showLoginViewController {
-    LoginViewController* loginController = (LoginViewController*) [ApplicationDelegate.storyBoard instantiateViewControllerWithIdentifier:@"LoginViewController"];
-	loginController.dataModel = _dataModel;
-	[self presentViewController:loginController animated:YES completion:nil];
+    LoginViewController *loginController = (LoginViewController *) [ApplicationDelegate.storyBoard instantiateViewControllerWithIdentifier:@"LoginViewController"];
+    loginController.dataModel = _dataModel;
+    loginController.client = _client;
+    [self presentViewController:loginController animated:YES completion:nil];
 }
 
 - (void)userDidLeave

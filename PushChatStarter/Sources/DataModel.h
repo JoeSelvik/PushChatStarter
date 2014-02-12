@@ -38,4 +38,8 @@
 - (BOOL)joinedChat;
 - (void)setJoinedChat:(BOOL)value;
 
+- (NSString*)userId;
+- (NSString*)deviceToken;
+- (void)setDeviceToken:(NSString*)token;
+
 @end

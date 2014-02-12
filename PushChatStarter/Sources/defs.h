@@ -8,4 +8,4 @@
 // Convenience function to show a UIAlertView
 void ShowErrorAlert(NSString* text);
 
-#define ServerApiURL @"http://192.168.2.244:44447"
+#define ServerApiURL @"http://10.0.0.20:44447"
