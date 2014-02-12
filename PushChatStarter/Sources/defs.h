@@ -7,3 +7,5 @@
 
 // Convenience function to show a UIAlertView
 void ShowErrorAlert(NSString* text);
+
+#define ServerApiURL @"http://192.168.2.244:44447"
