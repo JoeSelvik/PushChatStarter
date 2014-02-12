@@ -7,6 +7,8 @@
 //
 
 #import "AppDelegate.h"
+#import "ChatViewController.h"
+#import "DataModel.h"
 
 void ShowErrorAlert(NSString* text)
 {
@@ -27,6 +29,10 @@ void ShowErrorAlert(NSString* text)
     // Override point for customization after application launch.
     
     _storyBoard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
+    
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+     (UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+    
     return YES;
 }
 							
@@ -55,6 +61,51 @@ void ShowErrorAlert(NSString* text)
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+// We don’t care about what happens to this Request. It is silently performed in the background. So if it fails, you don’t show an error message.
+- (void)postUpdateRequest
+{
+    UINavigationController *navigationController = (UINavigationController*)_window.rootViewController;
+    ChatViewController *chatViewController = (ChatViewController*)[navigationController.viewControllers objectAtIndex:0];
+    
+    DataModel *dataModel = chatViewController.dataModel;
+    
+    NSDictionary *params = @{@"cmd":@"update",
+                             @"user_id":[dataModel userId],
+                             @"token":[dataModel deviceToken]};
+    AFHTTPClient *client = [AFHTTPClient clientWithBaseURL:[NSURL URLWithString:ServerApiURL]];
+    [client
+     postPath:@"/api.php"
+     parameters:params
+     success:nil failure:nil];
+}
+
+- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
+{
+    UINavigationController *navigationController = (UINavigationController*)_window.rootViewController;
+    ChatViewController *chatViewController = (ChatViewController*)[navigationController.viewControllers objectAtIndex:0];
+    
+    DataModel *dataModel = chatViewController.dataModel;
+	NSString *oldToken = [dataModel deviceToken];
+    
+	NSString *newToken = [deviceToken description];
+	newToken = [newToken stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"<>"]];
+	newToken = [newToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+	NSLog(@"My token is: %@", newToken);
+    
+	[dataModel setDeviceToken:newToken];
+    
+	if ([dataModel joinedChat] && ![newToken isEqualToString:oldToken])
+	{
+		[self postUpdateRequest];
+	}
+}
+
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+	NSLog(@"Failed to get token, error: %@", error);
 }
 
 @end
