@@ -14,11 +14,14 @@ static NSString* const NicknameKey = @"Nickname";
 static NSString* const SecretCodeKey = @"SecretCode";
 static NSString* const JoinedChatKey = @"JoinedChat";
 static NSString* const UserId = @"UserId";
+static NSString* const DeviceTokenKey = @"DeviceToken";
 
 @implementation DataModel
 
 @synthesize messages;
 
+// called by the Objective-C runtime when the DataModel class is used for the very first
+// time, you set default values for all the settings you store in NSUserDefaults.
 + (void)initialize
 {
 	if (self == [DataModel class])
@@ -27,7 +30,9 @@ static NSString* const UserId = @"UserId";
 		[[NSUserDefaults standardUserDefaults] registerDefaults:
 			@{NicknameKey: @"",
 				SecretCodeKey: @"",
-				JoinedChatKey: @0}];
+				JoinedChatKey: @0,
+                DeviceTokenKey: @"0",
+                UserId:@""}];
 	}
 }
 
@@ -117,5 +122,16 @@ static NSString* const UserId = @"UserId";
     }
     return userId;
 }
+
+- (NSString*)deviceToken
+{
+	return [[NSUserDefaults standardUserDefaults] stringForKey:DeviceTokenKey];
+}
+
+- (void)setDeviceToken:(NSString*)token
+{
+	[[NSUserDefaults standardUserDefaults] setObject:token forKey:DeviceTokenKey];
+}
+
 
 @end
