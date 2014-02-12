@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "ChatViewController.h"
 #import "DataModel.h"
+#import "Message.h"
 
 void ShowErrorAlert(NSString* text)
 {
@@ -24,17 +25,62 @@ void ShowErrorAlert(NSString* text)
 
 @implementation AppDelegate
 
+- (void)addMessageFromRemoteNotification:(NSDictionary*)userInfo updateUI:(BOOL)updateUI
+{
+    UINavigationController *navigationController = (UINavigationController*)_window.rootViewController;
+    ChatViewController *chatViewController =
+    (ChatViewController*)[navigationController.viewControllers  objectAtIndex:0];
+    
+    DataModel *dataModel = chatViewController.dataModel;
+    
+	Message *message = [[Message alloc] init];
+	message.date = [NSDate date];
+    
+	NSString *alertValue = [[userInfo valueForKey:@"aps"] valueForKey:@"alert"];
+    
+	NSMutableArray *parts = [NSMutableArray arrayWithArray:[alertValue componentsSeparatedByString:@": "]];
+	message.senderName = [parts objectAtIndex:0];
+	[parts removeObjectAtIndex:0];
+	message.text = [parts componentsJoinedByString:@": "];
+    
+	int index = [dataModel addMessage:message];
+    
+	if (updateUI)
+		[chatViewController didSaveMessage:message atIndex:index];
+}
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    
     _storyBoard = [UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
     
+    // No badge
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
     
+    // If your app wasn’t running when the notification came in, it is launched and the notification is passed as part of the launchOptions dictionary.
+    if (launchOptions != nil)
+	{
+		NSDictionary *dictionary = [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+		if (dictionary != nil)
+		{
+			NSLog(@"Launched from push notification: %@", dictionary);
+            
+            // At that point, the table view isn’t loaded yet. So do not update UI yet
+			[self addMessageFromRemoteNotification:dictionary updateUI:NO];
+		}
+	}
+    
     return YES;
 }
+
+// This method is invoked if your app is active when a notification comes in. iOS4 or later it is called if app is suspended in the background
+- (void)application:(UIApplication*)application didReceiveRemoteNotification:(NSDictionary*)userInfo
+{
+	NSLog(@"Received notification: %@", userInfo);
+	[self addMessageFromRemoteNotification:userInfo updateUI:YES];
+}
+
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {
