@@ -144,9 +144,36 @@
 	[self showLoginViewController];
 }
 
+- (void)postLeaveRequest
+{
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    hud.labelText = NSLocalizedString(@"Signing Out", nil);
+    
+    NSDictionary *params = @{@"cmd":@"leave",
+                             @"user_id":[_dataModel userId]};
+    [_client
+     postPath:@"/api.php"
+     parameters:params
+     success:^(AFHTTPRequestOperation *operation, id responseObject) {
+         if ([self isViewLoaded]) {
+             [MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+             if (operation.response.statusCode != 200) {
+                 ShowErrorAlert(NSLocalizedString(@"There was an error communicating with the server", nil));
+             } else {
+                 [self userDidLeave];
+             }
+         }
+     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+         if ([self isViewLoaded]) {
+             [MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+             ShowErrorAlert([error localizedDescription]);
+         }
+     }];
+}
+
 - (IBAction)exitAction
 {
-	[self userDidLeave];
+    [self postLeaveRequest];
 }
 
 - (IBAction)composeAction
